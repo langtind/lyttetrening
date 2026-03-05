@@ -1,6 +1,6 @@
 {
   "name": "CI hva du hører",
-  "short_name": "CI Lytting",
+  "short_name": "Lyttetrening",
   "description": "Lyttetreningsprogram for voksne med cochleaimplantat",
   "start_url": ".",
   "display": "standalone",
