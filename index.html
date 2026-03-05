@@ -12,6 +12,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0E7C6B">
+<link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <style>
@@ -587,6 +590,58 @@ main {
 
 @keyframes cellHighlight {
   from { transform: scale(1.15); }
+}
+
+/* Install tip banner */
+.install-tip {
+  display: none;
+  position: fixed;
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 8px);
+  left: 12px;
+  right: 12px;
+  z-index: 98;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: bannerIn 0.4s var(--ease-spring);
+  align-items: flex-start;
+  gap: 12px;
+}
+.install-tip.show { display: flex; }
+.install-tip-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.install-tip-icon .material-icons-round { font-size: 22px; }
+.install-tip-content { flex: 1; min-width: 0; }
+.install-tip-title { font-weight: 650; font-size: 14px; margin-bottom: 2px; }
+.install-tip-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+.install-tip-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+.install-tip-close:hover { background: var(--surface-active); color: var(--text); }
+.install-tip-close .material-icons-round { font-size: 18px; }
+@media (min-width: 640px) {
+  .install-tip { bottom: 24px; left: auto; right: 24px; max-width: 380px; }
 }
 
 /* Speaker indicator — floating above bottom nav */
@@ -2355,6 +2410,35 @@ function miljoGuess(file) {
    INIT
    ═══════════════════════════════════════════ */
 initTheme();
+
+// Install tip — show once for mobile users not in standalone mode
+(function() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+    || window.navigator.standalone === true;
+  const dismissed = localStorage.getItem('ci-install-dismissed');
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  
+  if (!isStandalone && !dismissed && isMobile) {
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const tip = document.createElement('div');
+    tip.className = 'install-tip show';
+    tip.innerHTML = `
+      <div class="install-tip-icon"><span class="material-icons-round">add_to_home_screen</span></div>
+      <div class="install-tip-content">
+        <div class="install-tip-title">Legg til på hjemskjermen</div>
+        <div class="install-tip-desc">${isIOS 
+          ? 'Trykk <strong>Del</strong>-knappen og velg <strong>Legg til på Hjem-skjerm</strong> for best opplevelse.' 
+          : 'Trykk menyen <strong>(&#8942;)</strong> og velg <strong>Legg til på startskjermen</strong> for best opplevelse.'}</div>
+      </div>
+      <button class="install-tip-close" onclick="this.parentElement.remove(); localStorage.setItem('ci-install-dismissed','1')">
+        <span class="material-icons-round">close</span>
+      </button>`;
+    document.body.appendChild(tip);
+    
+    // Auto-dismiss after 15 seconds
+    setTimeout(() => { if (tip.parentElement) tip.remove(); }, 15000);
+  }
+})();
 </script>
 </body>
 </html>
