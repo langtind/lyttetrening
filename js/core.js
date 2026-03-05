@@ -143,6 +143,13 @@ function setMode(moduleId, mode, btn) {
       c.classList.remove('selected','dimmed','correct-cell','wrong-cell','highlighted');
     });
   }
+  // Ordpar: table always visible, toggle pair-display
+  if (moduleId === 'ordpar') {
+    document.getElementById('ordpar-table-wrap').style.display = '';
+    const pd = document.getElementById('pair-display');
+    if (pd) pd.style.display = 'none';
+    document.querySelectorAll('.ordpar-word.selected').forEach(c => c.classList.remove('selected'));
+  }
   // Miljolyder: toggle between full list and quiz
   if (moduleId === 'miljolyder') {
     document.getElementById('miljolyder-content').style.display = mode === 'lytte' ? '' : 'none';

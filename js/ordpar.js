@@ -44,14 +44,27 @@ function initOrdpar() {
     if (i === ordparCurrentType) opt.selected = true;
     select.appendChild(opt);
   });
+  // Reset UI to lytte state
+  document.getElementById('ordpar-table-wrap').style.display = '';
+  document.getElementById('exercise-controls-ordpar').style.display = 'none';
+  const pd = document.getElementById('pair-display');
+  if (pd) pd.style.display = 'none';
+  clearProgress('ordpar');
+  clearResult('ordpar');
+  // Reset mode selector buttons
+  document.querySelectorAll('#page-ordpar .mode-option').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === 'Lytte');
+  });
   renderOrdparTable();
 }
 
 function ordparSelectType(val) {
   ordparCurrentType = parseInt(val);
-  resetExercise('ordpar');
-  const pairDisplay = document.getElementById('pair-display');
-  if (pairDisplay) pairDisplay.style.display = 'none';
+  if (S.mode.ordpar === 'ove') {
+    resetExercise('ordpar');
+    const pd = document.getElementById('pair-display');
+    if (pd) pd.style.display = 'none';
+  }
   renderOrdparTable();
 }
 
@@ -88,8 +101,6 @@ function ordparStart() {
   if (!ex || ex.current === -1) {
     initExercise('ordpar', shuffle(Array.from({length: data.data.length}, (_, i) => i)), Math.min(20, data.data.length));
   }
-  // Hide table in exercise mode
-  document.getElementById('ordpar-table-wrap').style.display = 'none';
   ordparNext();
 }
 
@@ -100,7 +111,6 @@ function ordparNext() {
     resetExercise('ordpar');
     const pd = document.getElementById('pair-display');
     if (pd) pd.style.display = 'none';
-    document.getElementById('ordpar-table-wrap').style.display = '';
     return;
   }
 
@@ -149,7 +159,16 @@ function ordparRepeat() {
   const typePrefix = ORDPAR_DATA[ordparCurrentType].type;
   const pairIdx = ex.current + 1;
   const answerIdx = ex.currentAnswer + 1;
-  playAudio(`audio/ordpar/${S.voice}/${typePrefix}ord${pairIdx}-${answerIdx}.mp3`, 'ordpar');
+  // Replay: word 1, word 2, then target word
+  playAudio(`audio/ordpar/${S.voice}/${typePrefix}ord${pairIdx}-1.mp3`, 'ordpar', () => {
+    setTimeout(() => {
+      playAudio(`audio/ordpar/${S.voice}/${typePrefix}ord${pairIdx}-2.mp3`, 'ordpar', () => {
+        setTimeout(() => {
+          playAudio(`audio/ordpar/${S.voice}/${typePrefix}ord${pairIdx}-${answerIdx}.mp3`, 'ordpar');
+        }, 400);
+      });
+    }, 400);
+  });
 }
 
 function ordparGuess(chosenIdx) {
