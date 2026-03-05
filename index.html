@@ -664,6 +664,76 @@ main {
 }
 .dato-cell.dimmed, .dato-month-cell.dimmed { opacity: 0.3; pointer-events: none; }
 
+/* ═══════════════════════════════════════════
+   OPPBYGGING SENTENCES
+   ═══════════════════════════════════════════ */
+.oppbygging-word-group {
+  margin-bottom: 16px;
+}
+.oppbygging-word-label {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 6px;
+  padding-left: 2px;
+}
+.oppbygging-sentence {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.oppbygging-sentence:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+.oppbygging-sentence:active { transform: scale(0.98); }
+.oppbygging-level {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.oppbygging-text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.oppbygging-sentence.selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.oppbygging-sentence.correct-cell {
+  background: var(--correct-soft) !important;
+  border-color: var(--correct) !important;
+}
+.oppbygging-sentence.correct-cell .oppbygging-level { background: var(--correct-soft); color: var(--correct); }
+.oppbygging-sentence.wrong-cell {
+  background: var(--wrong-soft) !important;
+  border-color: var(--wrong) !important;
+}
+.oppbygging-sentence.wrong-cell .oppbygging-level { background: var(--wrong-soft); color: var(--wrong); }
+.oppbygging-sentence.highlighted {
+  background: var(--yellow-soft);
+  border-color: var(--yellow);
+  animation: cellHighlight 0.3s var(--ease-spring);
+}
+.oppbygging-sentence.highlighted .oppbygging-level { background: var(--yellow-soft); color: var(--yellow); }
+
 /* Install tip banner */
 .install-tip {
   display: none;
@@ -1561,7 +1631,6 @@ input[type="range"]::-webkit-slider-thumb {
 
   <div class="word-tabs" id="oppbygging-tabs"></div>
 
-
   <div id="exercise-controls-oppbygging" class="exercise-controls" style="display:none;">
     <button class="ctrl-btn primary pulsing" id="start-btn-oppbygging" onclick="oppbyggingStart()">
       <span class="material-icons-round">play_arrow</span>Start
@@ -1576,7 +1645,7 @@ input[type="range"]::-webkit-slider-thumb {
 
   <div class="progress-bar" id="progress-oppbygging"></div>
   <div class="result-banner" id="result-oppbygging"></div>
-  <div class="word-grid" id="oppbygging-grid"></div>
+  <div id="oppbygging-sentences"></div>
 </section>
 
 <!-- ═══════════════════════════════════════════
@@ -2444,92 +2513,224 @@ function ordparGuess(chosenIdx) {
    MODULE: OPPBYGGING (Sentence building)
    ═══════════════════════════════════════════ */
 const OPPBYGGING_DATA = {
-  A: { display: ["Ferie","Penger","Kom inn","Bok","Teater","Regn"], audio: ["ferie","penger","kominn","bok","teater","regn"] },
-  B: { display: ["Leker","Kino","Middag","Avtale","Tur","Varmt"], audio: ["leker","kino","middag","avtale","tur","varmt"] },
+  'Del 1': [
+    { word: 'Ferie', audio: 'ferie', sentences: [
+      'Vi reiser på ferie.',
+      'Vi reiser på ferie til sommeren.',
+      'Vi reiser på ferie til sommeren sammen med venner.',
+      'Vi reiser på ferie til sommeren sammen med venner til utlandet.',
+      'Vi reiser på ferie til sommeren sammen med venner til utlandet og gleder oss.',
+      'Vi reiser på ferie til sommeren sammen med venner til utlandet og gleder oss til nye opplevelser.'
+    ]},
+    { word: 'Penger', audio: 'penger', sentences: [
+      'Penger i banken.',
+      'Penger i banken er lurt.',
+      'Penger i banken er lurt når du skal handle.',
+      'Penger i banken er lurt når du skal handle nye klær.',
+      'Penger i banken er lurt når du skal handle nye klær til festen.',
+      'Penger i banken er lurt når du skal handle nye klær til festen i morgen.'
+    ]},
+    { word: 'Kom inn', audio: 'kominn', sentences: [
+      'Kom inn snart!',
+      'Kom inn snart er du snill!',
+      'Kom inn snart er du snill, det er sent!',
+      'Kom inn snart er du snill, det er sent, barne-tv begynner!',
+      'Kom inn snart er du snill, det er sent, barne-tv begynner om en liten stund!',
+      'Kom inn snart er du snill, det er sent, barne-tv begynner om en liten stund, hvis du vil se et.'
+    ]},
+    { word: 'Bok', audio: 'bok', sentences: [
+      'Les denne boken!',
+      'Les denne boken, den er god!',
+      'Les denne boken, den er god, den får deg til å tenke!',
+      'Les denne boken, den er god, den får deg til å tenke på lørdagskos.',
+      'Les denne boken, den er god, den får deg til å tenke på lørdagskos selv om det er hverdag.',
+      'Les denne boken, den er god, den får deg til å tenke på lørdagskos selv om det er hverdag, jeg liker forfatteren.'
+    ]},
+    { word: 'Teater', audio: 'teater', sentences: [
+      'Jeg skal på teater.',
+      'Jeg skal på teater i morgen.',
+      'Jeg skal på teater i morgen med min søster.',
+      'Jeg skal på teater i morgen med min søster og hennes datter.',
+      'Jeg skal på teater i morgen med min søster og hennes datter, og min datter.',
+      'Jeg skal på teater i morgen med min søster og hennes datter, og min datter for å se Per Gynt.'
+    ]},
+    { word: 'Regn', audio: 'regn', sentences: [
+      'Det regner.',
+      'Det regner i dag.',
+      'Det regner mye i dag.',
+      'Det regner mye i dag, og vi må ha på regntøy.',
+      'Det regner mye i dag, og vi må ha på regntøy og støvler.',
+      'Det regner mye i dag, og vi må ha på regntøy og støvler for at vi ikke skal bli våte.'
+    ]},
+  ],
+  'Del 2': [
+    { word: 'Leker', audio: 'leker', sentences: [
+      'Gutten leker.',
+      'Gutten leker med bil.',
+      'Gutten leker med bil i barnehagen.',
+      'Gutten leker med bil i barnehagen hver dag.',
+      'Gutten leker med bil i barnehagen hver dag når han får velge selv.',
+      'Når gutten får velge selv, leker han med bil i barnehagen hver dag.'
+    ]},
+    { word: 'Kino', audio: 'kino', sentences: [
+      'Vi skal på kino.',
+      'Vi skal på kino i kveld.',
+      'Vi skal på kino i morgen kveld.',
+      'Vi skal på kino i morgen kveld og se en ny film.',
+      'Vi skal på kino i morgen kveld og se en spennende film.',
+      'Vi skal på kino i morgen kveld og se en spennende film som jeg har sett før.'
+    ]},
+    { word: 'Middag', audio: 'middag', sentences: [
+      'Vi skal spise middag.',
+      'Vi skal spise middag klokken fire.',
+      'Vi skal spise fisk til middag klokken fire.',
+      'Vi skal spise middag sammen klokken fire på restaurant.',
+      'Vi skal spise middag hjemme klokken fire, og vi blir åtte til bords.',
+      'Vi skal spise middag hjemme klokken fire, og vi blir åtte til bords hvis alle kommer.'
+    ]},
+    { word: 'Avtale', audio: 'avtale', sentences: [
+      'Jeg har en avtale.',
+      'Jeg har ordnet med en avtale.',
+      'Jeg har ordnet med en ny avtale.',
+      'Jeg har ordnet med en ny avtale til neste onsdag.',
+      'Jeg har ordnet med en ny avtale til deg neste onsdag.',
+      'Jeg har ordnet med en ny avtale til deg neste onsdag klokka 15.'
+    ]},
+    { word: 'Tur', audio: 'tur', sentences: [
+      'Ut på tur.',
+      'Å gå ut på tur.',
+      'Jeg liker å gå ut på tur.',
+      'Jeg liker å gå ut på tur i all slags vær.',
+      'Jeg liker å gå ut på tur i all slags vær sammen med en venninne.',
+      'Jeg liker å gå ut på tur i all slags vær sammen med en venninne, spesielt i helgene.'
+    ]},
+    { word: 'Varmt', audio: 'varmt', sentences: [
+      'Det er varmt.',
+      'I dag er det varmt vær.',
+      'I dag er det passende varmt vær.',
+      'I dag synes jeg det er passende varmt vær.',
+      'I dag synes jeg det er passende varmt vær til å ta en dukkert i sjøen.',
+      'I dag synes jeg det er passende varmt vær til å ta en dukkert i sjøen ved campingplassen.'
+    ]},
+  ],
 };
 
-let oppbyggingGroup = 'A';
+let oppbyggingGroup = 'Del 1';
 
 function initOppbygging() {
   S.mode.oppbygging = 'lytte';
-  renderOrdTabs('oppbygging-tabs', Object.keys(OPPBYGGING_DATA), oppbyggingGroup, (g) => { oppbyggingGroup = g; renderOppbyggingGrid(); });
-  renderOppbyggingGrid();
+  renderOrdTabs('oppbygging-tabs', Object.keys(OPPBYGGING_DATA), oppbyggingGroup, (g) => { oppbyggingGroup = g; renderOppbyggingSentences(); });
+  renderOppbyggingSentences();
 }
 
-function renderOppbyggingGrid() {
-  const grid = document.getElementById('oppbygging-grid');
-  const data = OPPBYGGING_DATA[oppbyggingGroup];
-  grid.innerHTML = '';
-  data.display.forEach((word, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'word-cell';
-    cell.textContent = word;
-    cell.addEventListener('click', () => oppbyggingCellClick(i));
-    grid.appendChild(cell);
+function renderOppbyggingSentences() {
+  const container = document.getElementById('oppbygging-sentences');
+  const words = OPPBYGGING_DATA[oppbyggingGroup];
+  container.innerHTML = '';
+
+  words.forEach((item, wordIdx) => {
+    const group = document.createElement('div');
+    group.className = 'oppbygging-word-group';
+
+    const label = document.createElement('div');
+    label.className = 'oppbygging-word-label';
+    label.textContent = item.word;
+    group.appendChild(label);
+
+    item.sentences.forEach((sentence, levelIdx) => {
+      const row = document.createElement('div');
+      row.className = 'oppbygging-sentence';
+      row.dataset.word = wordIdx;
+      row.dataset.level = levelIdx;
+      row.innerHTML = `<div class="oppbygging-level">${levelIdx + 1}</div><div class="oppbygging-text">${sentence}</div>`;
+      row.addEventListener('click', () => oppbyggingSentenceClick(wordIdx, levelIdx));
+      group.appendChild(row);
+    });
+
+    container.appendChild(group);
   });
   resetExercise('oppbygging');
 }
 
-let oppbyggingSentenceNum = 1;
-
-function oppbyggingCellClick(idx) {
-  const data = OPPBYGGING_DATA[oppbyggingGroup];
-  oppbyggingSentenceNum = Math.ceil(Math.random() * 6);
+function oppbyggingSentenceClick(wordIdx, levelIdx) {
   if ((S.mode.oppbygging || 'lytte') === 'lytte') {
-    playAudio(`audio/oppbygging/${S.voice}/${data.audio[idx]}${oppbyggingSentenceNum}.mp3`, 'oppbygging');
-    highlightWordCell('oppbygging-grid', idx);
+    const words = OPPBYGGING_DATA[oppbyggingGroup];
+    playAudio(`audio/oppbygging/${S.voice}/${words[wordIdx].audio}${levelIdx + 1}.mp3`, 'oppbygging');
+    document.querySelectorAll('#oppbygging-sentences .oppbygging-sentence.selected').forEach(c => c.classList.remove('selected'));
+    const el = document.querySelector(`#oppbygging-sentences .oppbygging-sentence[data-word="${wordIdx}"][data-level="${levelIdx}"]`);
+    if (el) el.classList.add('selected');
   } else {
-    oppbyggingGuess(idx);
+    oppbyggingGuess(wordIdx, levelIdx);
   }
 }
 
+let oppbyggingCurrentCombo = null;
+
 function oppbyggingStart() {
-  const data = OPPBYGGING_DATA[oppbyggingGroup];
   const ex = exercises.oppbygging;
   if (!ex || ex.current === -1) {
-    initExercise('oppbygging', shuffle(Array.from({length: data.display.length}, (_, i) => i)), data.display.length);
+    // Generate all word+level combos
+    const words = OPPBYGGING_DATA[oppbyggingGroup];
+    const combos = [];
+    words.forEach((_, wi) => {
+      for (let li = 0; li < 6; li++) combos.push({ word: wi, level: li });
+    });
+    initExercise('oppbygging', shuffle(combos), 20);
   }
   oppbyggingNext();
 }
 
 function oppbyggingNext() {
   const ex = exercises.oppbygging;
-  if (ex.answered >= ex.total) { showResult('oppbygging'); resetExercise('oppbygging'); return; }
-  document.querySelectorAll('#oppbygging-grid .word-cell').forEach(c => c.classList.remove('selected','correct-cell','wrong-cell','highlighted'));
-  ex.current = ex.items[ex.answered];
-  ex.currentAnswer = ex.current;
-  oppbyggingSentenceNum = Math.ceil(Math.random() * 6);
+  if (ex.answered >= ex.total) { showResult('oppbygging'); resetExercise('oppbygging'); oppbyggingCurrentCombo = null; return; }
+
+  document.querySelectorAll('#oppbygging-sentences .oppbygging-sentence').forEach(c =>
+    c.classList.remove('selected','correct-cell','wrong-cell','highlighted'));
+
+  const combo = ex.items[ex.answered];
+  ex.current = combo;
+  ex.currentAnswer = combo;
+  oppbyggingCurrentCombo = combo;
   renderProgress('oppbygging');
+
   const btn = document.getElementById('start-btn-oppbygging');
   btn.innerHTML = '<span class="material-icons-round">skip_next</span>Neste';
   btn.classList.remove('pulsing');
   document.getElementById('repeat-btn-oppbygging').disabled = false;
   document.getElementById('fasit-btn-oppbygging').disabled = false;
-  const data = OPPBYGGING_DATA[oppbyggingGroup];
-  playAudio(`audio/oppbygging/${S.voice}/${data.audio[ex.current]}${oppbyggingSentenceNum}.mp3`, 'oppbygging');
+
+  const words = OPPBYGGING_DATA[oppbyggingGroup];
+  playAudio(`audio/oppbygging/${S.voice}/${words[combo.word].audio}${combo.level + 1}.mp3`, 'oppbygging');
 }
 
 function oppbyggingRepeat() {
-  const ex = exercises.oppbygging;
-  if (ex?.currentAnswer !== null) {
-    const data = OPPBYGGING_DATA[oppbyggingGroup];
-    playAudio(`audio/oppbygging/${S.voice}/${data.audio[ex.currentAnswer]}${oppbyggingSentenceNum}.mp3`, 'oppbygging');
-  }
+  if (!oppbyggingCurrentCombo) return;
+  const words = OPPBYGGING_DATA[oppbyggingGroup];
+  const c = oppbyggingCurrentCombo;
+  playAudio(`audio/oppbygging/${S.voice}/${words[c.word].audio}${c.level + 1}.mp3`, 'oppbygging');
 }
 
 function oppbyggingFasit() {
   const ex = exercises.oppbygging;
-  if (!ex || ex.currentAnswer === null) return;
-  document.querySelectorAll('#oppbygging-grid .word-cell')[ex.currentAnswer]?.classList.add('highlighted');
+  if (!ex || !ex.currentAnswer) return;
+  const c = ex.currentAnswer;
+  const el = document.querySelector(`#oppbygging-sentences .oppbygging-sentence[data-word="${c.word}"][data-level="${c.level}"]`);
+  if (el) { el.classList.add('highlighted'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 }
 
-function oppbyggingGuess(idx) {
+function oppbyggingGuess(wordIdx, levelIdx) {
   const ex = exercises.oppbygging;
-  if (!ex || ex.currentAnswer === null) return;
-  const cells = document.querySelectorAll('#oppbygging-grid .word-cell');
-  const isCorrect = idx === ex.currentAnswer;
-  cells[idx]?.classList.add(isCorrect ? 'correct-cell' : 'wrong-cell');
-  if (!isCorrect) cells[ex.currentAnswer]?.classList.add('highlighted');
+  if (!ex || !ex.currentAnswer) return;
+
+  const isCorrect = wordIdx === ex.currentAnswer.word && levelIdx === ex.currentAnswer.level;
+  const clicked = document.querySelector(`#oppbygging-sentences .oppbygging-sentence[data-word="${wordIdx}"][data-level="${levelIdx}"]`);
+  if (clicked) clicked.classList.add(isCorrect ? 'correct-cell' : 'wrong-cell');
+
+  if (!isCorrect) {
+    const correct = document.querySelector(`#oppbygging-sentences .oppbygging-sentence[data-word="${ex.currentAnswer.word}"][data-level="${ex.currentAnswer.level}"]`);
+    if (correct) { correct.classList.add('highlighted'); correct.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }
+
   if (isCorrect) ex.correct++;
   ex.history.push(isCorrect);
   ex.answered++;
