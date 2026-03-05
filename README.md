@@ -25,6 +25,7 @@ Denne versjonen er et **redesign av brukergrensesnittet** — alt innhold og all
 | Modul | Beskrivelse |
 |-------|-------------|
 | **Tall** | Grunntall 0–99 |
+| **Dato** | Datoer og måneder — velg riktig dag og måned |
 | **Ord** | Enkeltord gruppert etter forbokstav (M, K, T, S, L, Mix) |
 | **Setning** | Ord i setningskontekst |
 | **Ordpar** | Minimale par — skille mellom lignende ord |

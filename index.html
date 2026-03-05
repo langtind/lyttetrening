@@ -596,6 +596,74 @@ main {
   from { transform: scale(1.15); }
 }
 
+/* ═══════════════════════════════════════════
+   DATO GRID
+   ═══════════════════════════════════════════ */
+.dato-section-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin: 16px 0 8px;
+}
+.dato-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.dato-month-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.dato-cell, .dato-month-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.dato-month-cell {
+  padding: 12px 8px;
+  font-size: 14px;
+}
+.dato-cell:hover, .dato-month-cell:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+.dato-cell:active, .dato-month-cell:active { transform: scale(0.9); }
+.dato-cell.selected, .dato-month-cell.selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dato-cell.correct-cell, .dato-month-cell.correct-cell {
+  background: var(--correct-soft) !important;
+  border-color: var(--correct) !important;
+  color: var(--correct) !important;
+}
+.dato-cell.wrong-cell, .dato-month-cell.wrong-cell {
+  background: var(--wrong-soft) !important;
+  border-color: var(--wrong) !important;
+  color: var(--wrong) !important;
+}
+.dato-cell.highlighted, .dato-month-cell.highlighted {
+  background: var(--yellow-soft);
+  border-color: var(--yellow);
+  color: var(--yellow);
+  animation: cellHighlight 0.3s var(--ease-spring);
+}
+.dato-cell.dimmed, .dato-month-cell.dimmed { opacity: 0.3; pointer-events: none; }
+
 /* Install tip banner */
 .install-tip {
   display: none;
@@ -1007,6 +1075,8 @@ input[type="range"]::-webkit-slider-thumb {
   .module-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .number-grid { grid-template-columns: repeat(10, 1fr); gap: 5px; }
   .num-cell { font-size: 16px; }
+  .dato-grid { grid-template-columns: repeat(7, 1fr); }
+  .dato-month-grid { grid-template-columns: repeat(4, 1fr); }
   .word-grid { grid-template-columns: repeat(4, 1fr); }
   .sound-grid { grid-template-columns: repeat(3, 1fr); }
   .pair-option { padding: 36px 28px; font-size: 26px; }
@@ -1120,6 +1190,7 @@ input[type="range"]::-webkit-slider-thumb {
 
   <nav class="desktop-nav" style="display:none;">
     <button class="nav-link" data-page="tall" onclick="navigateTo('tall')">Tall</button>
+    <button class="nav-link" data-page="dato" onclick="navigateTo('dato')">Dato</button>
     <button class="nav-link" data-page="ord" onclick="navigateTo('ord')">Ord</button>
     <button class="nav-link" data-page="ordpar" onclick="navigateTo('ordpar')">Ordpar</button>
     <button class="nav-link" data-page="miljolyder" onclick="navigateTo('miljolyder')">Miljølyder</button>
@@ -1142,6 +1213,10 @@ input[type="range"]::-webkit-slider-thumb {
   <button class="nav-item" data-page="tall" onclick="navigateTo('tall')">
     <span class="material-icons-round">pin</span>
     <span>Tall</span>
+  </button>
+  <button class="nav-item" data-page="dato" onclick="navigateTo('dato')">
+    <span class="material-icons-round">calendar_month</span>
+    <span>Dato</span>
   </button>
   <button class="nav-item" data-page="ord" onclick="navigateTo('ord')">
     <span class="material-icons-round">text_fields</span>
@@ -1172,6 +1247,12 @@ input[type="range"]::-webkit-slider-thumb {
       <div class="card-icon teal"><span class="material-icons-round">pin</span></div>
       <div class="card-title">Tall</div>
       <div class="card-desc">Grunntall 0-99</div>
+    </div>
+
+    <div class="module-card" onclick="navigateTo('dato')">
+      <div class="card-icon yellow"><span class="material-icons-round">calendar_month</span></div>
+      <div class="card-title">Dato</div>
+      <div class="card-desc">Datoer og måneder</div>
     </div>
 
     <div class="module-card" onclick="navigateTo('ord')">
@@ -1259,6 +1340,58 @@ input[type="range"]::-webkit-slider-thumb {
   <div class="result-banner" id="result-tall"></div>
 
   <div class="number-grid" id="number-grid"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: DATO
+     ═══════════════════════════════════════════ -->
+<section class="page" id="page-dato">
+  <div class="page-header">
+    <button class="back-btn" onclick="navigateTo('home')"><span class="material-icons-round">arrow_back</span></button>
+    <h2 class="page-title">Dato</h2>
+  </div>
+
+  <div class="mode-selector">
+    <button class="mode-option active" onclick="setMode('dato','lytte',this)">Lytte</button>
+    <button class="mode-option" onclick="setMode('dato','ove',this)">Øve</button>
+  </div>
+
+  <div class="settings-bar">
+    <button class="pill-toggle active" data-voice="mann" onclick="setVoice('mann',this)">
+      <span class="material-icons-round">record_voice_over</span>Mann
+    </button>
+    <button class="pill-toggle" data-voice="dame" onclick="setVoice('dame',this)">
+      <span class="material-icons-round">record_voice_over</span>Dame
+    </button>
+    <button class="pill-toggle" onclick="toggleNoise(this)">
+      <span class="material-icons-round">volume_up</span>Støy
+    </button>
+  </div>
+
+  <div class="noise-panel" id="noise-panel-dato">
+    <label>Bakgrunnsstøy <span id="noise-val-dato">30%</span></label>
+    <input type="range" min="0" max="100" value="30" oninput="setNoiseVolume(this.value,'dato')">
+  </div>
+
+  <div id="exercise-controls-dato" class="exercise-controls" style="display:none;">
+    <button class="ctrl-btn primary pulsing" id="start-btn-dato" onclick="datoStart()">
+      <span class="material-icons-round">play_arrow</span>Start
+    </button>
+    <button class="ctrl-btn secondary" id="repeat-btn-dato" onclick="datoRepeat()" disabled>
+      <span class="material-icons-round">replay</span>Gjenta
+    </button>
+    <button class="ctrl-btn secondary" id="fasit-btn-dato" onclick="datoFasit()" disabled>
+      <span class="material-icons-round">help_outline</span>Fasit
+    </button>
+  </div>
+
+  <div class="progress-bar" id="progress-dato"></div>
+  <div class="result-banner" id="result-dato"></div>
+
+  <h3 class="dato-section-label">Dag</h3>
+  <div class="dato-grid" id="dato-dag-grid"></div>
+  <h3 class="dato-section-label">Måned</h3>
+  <div class="dato-month-grid" id="dato-mnd-grid"></div>
 </section>
 
 <!-- ═══════════════════════════════════════════
@@ -1547,6 +1680,7 @@ function navigateTo(page) {
 
   // Init module
   if (page === 'tall') initTall();
+  if (page === 'dato') initDato();
   if (page === 'ord') initOrd();
   if (page === 'setning') initSetning();
   if (page === 'ordpar') initOrdpar();
@@ -1634,6 +1768,12 @@ function setMode(moduleId, mode, btn) {
     const grid = document.getElementById(moduleId + '-grid') || document.getElementById('number-grid');
     if (grid) grid.querySelectorAll('[class*="-cell"]').forEach(c => {
       c.classList.remove('dimmed','correct-cell','wrong-cell','highlighted');
+    });
+  }
+  // Dato: clear both grids
+  if (moduleId === 'dato') {
+    document.querySelectorAll('#dato-dag-grid .dato-cell, #dato-mnd-grid .dato-month-cell').forEach(c => {
+      c.classList.remove('selected','dimmed','correct-cell','wrong-cell','highlighted');
     });
   }
   // Miljølyder: toggle between full list and quiz
@@ -1801,6 +1941,168 @@ function tallGuess(num) {
   renderProgress('tall');
 
   setTimeout(() => tallNext(), 1200);
+}
+
+/* ═══════════════════════════════════════════
+   MODULE: DATO (Dates)
+   ═══════════════════════════════════════════ */
+const MONTHS = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+const ORDINALS = ['1.','2.','3.','4.','5.','6.','7.','8.','9.','10.','11.','12.','13.','14.','15.','16.','17.','18.','19.','20.','21.','22.','23.','24.','25.','26.','27.','28.','29.','30.','31.'];
+
+function initDato() {
+  const dagGrid = document.getElementById('dato-dag-grid');
+  const mndGrid = document.getElementById('dato-mnd-grid');
+  if (dagGrid.children.length > 0) return;
+  S.mode.dato = 'lytte';
+
+  for (let i = 1; i <= 31; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'dato-cell';
+    cell.textContent = i + '.';
+    cell.dataset.dag = i;
+    cell.addEventListener('click', () => datoDagClick(i));
+    dagGrid.appendChild(cell);
+  }
+
+  MONTHS.forEach((m, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'dato-month-cell';
+    cell.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+    cell.dataset.mnd = idx;
+    cell.addEventListener('click', () => datoMndClick(idx));
+    mndGrid.appendChild(cell);
+  });
+}
+
+function datoDagClick(dag) {
+  if ((S.mode.dato || 'lytte') === 'lytte') {
+    playAudio(`audio/ordenstall/${S.voice}/${dag}.mp3`, 'dato');
+    document.querySelectorAll('#dato-dag-grid .dato-cell.selected').forEach(c => c.classList.remove('selected'));
+    const cells = document.querySelectorAll('#dato-dag-grid .dato-cell');
+    cells[dag - 1].classList.add('selected');
+  } else {
+    datoGuess('dag', dag);
+  }
+}
+
+function datoMndClick(idx) {
+  if ((S.mode.dato || 'lytte') === 'lytte') {
+    playAudio(`audio/dato/${S.voice}/${MONTHS[idx]}.mp3`, 'dato');
+    document.querySelectorAll('#dato-mnd-grid .dato-month-cell.selected').forEach(c => c.classList.remove('selected'));
+    const cells = document.querySelectorAll('#dato-mnd-grid .dato-month-cell');
+    cells[idx].classList.add('selected');
+  } else {
+    datoGuess('mnd', idx);
+  }
+}
+
+let datoSelection = { dag: null, mnd: null };
+
+function datoStart() {
+  const ex = exercises.dato;
+  if (!ex || ex.current === -1) {
+    // Generate random date+month combos
+    const combos = [];
+    for (let d = 1; d <= 31; d++) {
+      for (let m = 0; m < 12; m++) {
+        // Skip invalid dates (31st of months with 30 or fewer days, etc.)
+        if (d > 28 && m === 1) continue; // feb
+        if (d > 30 && [3,5,8,10].includes(m)) continue; // 30-day months
+        combos.push({ dag: d, mnd: m });
+      }
+    }
+    const items = shuffle(combos);
+    initExercise('dato', items, 20);
+  }
+  datoNext();
+}
+
+function datoNext() {
+  const ex = exercises.dato;
+  if (ex.answered >= ex.total) { showResult('dato'); resetExercise('dato'); return; }
+
+  document.querySelectorAll('#dato-dag-grid .dato-cell, #dato-mnd-grid .dato-month-cell').forEach(c =>
+    c.classList.remove('selected','correct-cell','wrong-cell','highlighted'));
+
+  const combo = ex.items[ex.answered];
+  ex.current = combo;
+  ex.currentAnswer = combo;
+  datoSelection = { dag: null, mnd: null };
+  renderProgress('dato');
+
+  const btn = document.getElementById('start-btn-dato');
+  btn.innerHTML = '<span class="material-icons-round">skip_next</span>Neste';
+  btn.classList.remove('pulsing');
+  document.getElementById('repeat-btn-dato').disabled = false;
+  document.getElementById('fasit-btn-dato').disabled = false;
+
+  // Play ordinal number then month
+  playAudio(`audio/ordenstall/${S.voice}/${combo.dag}.mp3`, 'dato', () => {
+    setTimeout(() => {
+      playAudio(`audio/dato/${S.voice}/${MONTHS[combo.mnd]}.mp3`, 'dato');
+    }, 300);
+  });
+}
+
+function datoRepeat() {
+  const ex = exercises.dato;
+  if (!ex || !ex.currentAnswer) return;
+  const combo = ex.currentAnswer;
+  playAudio(`audio/ordenstall/${S.voice}/${combo.dag}.mp3`, 'dato', () => {
+    setTimeout(() => {
+      playAudio(`audio/dato/${S.voice}/${MONTHS[combo.mnd]}.mp3`, 'dato');
+    }, 300);
+  });
+}
+
+function datoFasit() {
+  const ex = exercises.dato;
+  if (!ex || !ex.currentAnswer) return;
+  const dagCells = document.querySelectorAll('#dato-dag-grid .dato-cell');
+  const mndCells = document.querySelectorAll('#dato-mnd-grid .dato-month-cell');
+  dagCells[ex.currentAnswer.dag - 1].classList.add('highlighted');
+  mndCells[ex.currentAnswer.mnd].classList.add('highlighted');
+}
+
+function datoGuess(type, val) {
+  const ex = exercises.dato;
+  if (!ex || !ex.currentAnswer) return;
+
+  if (type === 'dag') {
+    datoSelection.dag = val;
+    document.querySelectorAll('#dato-dag-grid .dato-cell').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('#dato-dag-grid .dato-cell')[val - 1].classList.add('selected');
+  } else {
+    datoSelection.mnd = val;
+    document.querySelectorAll('#dato-mnd-grid .dato-month-cell').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('#dato-mnd-grid .dato-month-cell')[val].classList.add('selected');
+  }
+
+  // Both selected? Evaluate
+  if (datoSelection.dag !== null && datoSelection.mnd !== null) {
+    const dagCorrect = datoSelection.dag === ex.currentAnswer.dag;
+    const mndCorrect = datoSelection.mnd === ex.currentAnswer.mnd;
+    const isCorrect = dagCorrect && mndCorrect;
+
+    const dagCells = document.querySelectorAll('#dato-dag-grid .dato-cell');
+    const mndCells = document.querySelectorAll('#dato-mnd-grid .dato-month-cell');
+
+    dagCells[datoSelection.dag - 1].classList.remove('selected');
+    dagCells[datoSelection.dag - 1].classList.add(dagCorrect ? 'correct-cell' : 'wrong-cell');
+    mndCells[datoSelection.mnd].classList.remove('selected');
+    mndCells[datoSelection.mnd].classList.add(mndCorrect ? 'correct-cell' : 'wrong-cell');
+
+    if (!dagCorrect) dagCells[ex.currentAnswer.dag - 1].classList.add('highlighted');
+    if (!mndCorrect) mndCells[ex.currentAnswer.mnd].classList.add('highlighted');
+
+    if (isCorrect) ex.correct++;
+    ex.history.push(isCorrect);
+    ex.answered++;
+    ex.currentAnswer = null;
+    renderProgress('dato');
+
+    setTimeout(() => datoNext(), 1200);
+  }
 }
 
 /* ═══════════════════════════════════════════
