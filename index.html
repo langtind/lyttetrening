@@ -368,10 +368,14 @@
     <input type="range" min="0" max="100" value="30" oninput="setNoiseVolume(this.value,'ordpar')">
   </div>
 
+  <div class="mode-selector">
+    <button class="mode-option active" onclick="setMode('ordpar','lytte',this)">Lytte</button>
+    <button class="mode-option" onclick="setMode('ordpar','ove',this)">Øve</button>
+  </div>
+
   <select class="styled-select" id="ordpar-select" onchange="ordparSelectType(this.value)"></select>
 
-
-  <div class="exercise-controls">
+  <div id="exercise-controls-ordpar" class="exercise-controls" style="display:none;">
     <button class="ctrl-btn primary pulsing" id="start-btn-ordpar" onclick="ordparStart()">
       <span class="material-icons-round">play_arrow</span>Start
     </button>
@@ -385,9 +389,7 @@
 
   <div class="pair-display" id="pair-display" style="display:none;"></div>
 
-  <div class="info-card" id="ordpar-info">
-    <p>Velg en ordpartype ovenfor og trykk Start. Du vil høre ett av ordene, og skal velge hvilket du hører.</p>
-  </div>
+  <div id="ordpar-table-wrap"></div>
 </section>
 
 <!-- ═══════════════════════════════════════════
@@ -493,16 +495,16 @@
   </div>
 </div>
 
-<script src="js/core.js"></script>
-<script src="js/tall.js"></script>
-<script src="js/dato.js"></script>
-<script src="js/ord.js"></script>
-<script src="js/setning.js"></script>
-<script src="js/ordpar.js"></script>
-<script src="js/oppbygging.js"></script>
-<script src="js/miljolyder.js"></script>
-<script src="js/tekster-data.js"></script>
-<script src="js/tekster.js"></script>
-<script src="js/init.js"></script>
+<script src="js/core.js?v=2"></script>
+<script src="js/tall.js?v=2"></script>
+<script src="js/dato.js?v=2"></script>
+<script src="js/ord.js?v=2"></script>
+<script src="js/setning.js?v=2"></script>
+<script src="js/ordpar.js?v=2"></script>
+<script src="js/oppbygging.js?v=2"></script>
+<script src="js/miljolyder.js?v=2"></script>
+<script src="js/tekster-data.js?v=2"></script>
+<script src="js/tekster.js?v=2"></script>
+<script src="js/init.js?v=2"></script>
 </body>
 </html>
